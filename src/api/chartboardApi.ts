@@ -52,3 +52,18 @@ export const selectChartFromDashboard = async(dashboardInfoId:number) => {
     const res = await axios.get(`${API_SERVER_URL}/selectChartFromDashboard`, {params: {dashboardInfoId}});
     return res.data;
 }
+
+interface ChartDashboardConnectDto{
+    chartInfoId: number;
+    dashboardInfoId: number;
+    dashboardX: number;
+    dashboardY: number;
+    dashboardW: number;
+    dashboardH: number;
+}
+
+//	대시보드에서 차트의 x, ,y, w, h 수정
+export const updateChartDashboardConnect = async(chartDashboardConnectDto: ChartDashboardConnectDto) => {
+    const res = await axios.put(`${API_SERVER_URL}/updateChartDashboardConnect`,chartDashboardConnectDto)
+    return res.data;
+}

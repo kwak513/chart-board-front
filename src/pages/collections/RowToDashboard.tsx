@@ -2,7 +2,7 @@ import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { useLocation } from "react-router-dom";
-import { selectChartFromDashboard } from "../../api/chartboardApi";
+import { selectChartFromDashboard, updateChartDashboardConnect } from "../../api/chartboardApi";
 import DrawBarChartComponent from "../../components/customSqlSearch/DrawBarChartComponent";
 import DrawLineChartComponent from "../../components/customSqlSearch/DrawLineChartComponent";
 import DrawScatterChartComponent from "../../components/customSqlSearch/DrawScatterChartComponent";
@@ -81,23 +81,24 @@ const RowToDashboard = () => {
 
     }
 
+
     const handleDashboardSaveClick = () => {
         currentLayout.map((layout) => {
-            const chartSizePositionDto = 
+            const chartDashboardConnectDto = 
             {
                 "dashboardX": layout.x,
                 "dashboardY": layout.y,
                 "dashboardW": layout.w,
                 "dashboardH": layout.h,
                 "chartInfoId": layout.i,
-                "dashBoardInfoId": id,
+                "dashboardInfoId": id,
             }
-            insertIntoChartInfoSizePosition(chartSizePositionDto)
+            updateChartDashboardConnect(chartDashboardConnectDto)
                 .then((res) => {
-                    console.log("insertIntoChartInfoSizePosition success" + res);
+                    console.log("updateChartDashboardConnect success" + res);
                 })
                 .catch((err) => {
-                    console.log("insertIntoChartInfoSizePosition failed" + err);
+                    console.log("updateChartDashboardConnect failed" + err);
                     // alert("대시보드가 저장 실패했습니다.")
                 })
         })
@@ -108,8 +109,9 @@ const RowToDashboard = () => {
     return (
         <>
             <div>
-                <div className='flex justify-end'>
-                    <Button onClick={handleDashboardSaveClick}>저장</Button>
+                <div className='flex justify-end gap-5'>
+                    <Button color="primary" variant="outlined">차트 추가</Button>
+                    <Button color="primary" variant="outlined" onClick={handleDashboardSaveClick}>저장</Button>
                 </div>
 
                 <ResponsiveGridLayout
@@ -123,8 +125,8 @@ const RowToDashboard = () => {
                             key={info.id} 
                             data-grid={{
                                 i: String(info.id),
-                                x: info.dashboard_x ? info.dashboard_x: index,
-                                y: info.dashboard_y ? info.dashboard_y: 0,
+                                x: info.dashboard_x ? info.dashboard_x: index % 3,
+                                y: info.dashboard_y ? info.dashboard_y: Math.floor(index / 3),
                                 w: info.dashboard_w ? info.dashboard_w: 1,
                                 h: info.dashboard_h ? info.dashboard_h: 2,
                                 minW: 1,
