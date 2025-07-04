@@ -1,7 +1,7 @@
 import { BarChartOutlined, DashboardOutlined, DotChartOutlined, LineChartOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Divider, Flex, Radio, Table } from "antd";
-import { useState } from "react";
-import { insertIntoChartInfo, showResultTableByCustomQuery } from "../../api/chartboardApi";
+import { useEffect, useState } from "react";
+import { insertIntoChartInfo, selectCountFromDbConnection, showResultTableByCustomQuery } from "../../api/chartboardApi";
 import InsertQueryComponent from "../../components/customSqlSearch/InsertQueryComponent";
 import SelectChartTypeComponent from "../../components/customSqlSearch/SelectChartTypeComponent";
 import InsertChartXYComponent from "../../components/customSqlSearch/InsertChartXYComponent";
@@ -9,8 +9,40 @@ import DrawBarChartComponent from "../../components/customSqlSearch/DrawBarChart
 import DrawLineChartComponent from "../../components/customSqlSearch/DrawLineChartComponent";
 import DrawScatterChartComponent from "../../components/customSqlSearch/DrawScatterChartComponent";
 import AddToDashBoardBtnComponent from "../../components/customSqlSearch/AddToDashBoardBtnComponent";
+import { useNavigate } from "react-router-dom";
 
 const CustomSqlSearchPage = () => {
+
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        //  로그인 안되어있으면 접근 X
+        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+            alert("로그인이 필요합니다.");
+            navigate('/login'); 
+        }
+
+        else{
+        
+            const userTableId = Number(sessionStorage.getItem("userTableId"));
+
+            console.log("userTableId", userTableId);
+
+            // 데이터베이스 정보를 입력하지 않은 사용자라면, 접근하지 못함. DB 정보 입력 페이지로 navigate
+            selectCountFromDbConnection(userTableId)
+                .then((res) => {
+                    if(!res){
+                        alert("데이터베이스 정보가 없습니다.");
+                        navigate('/dbconnect');
+                    }
+
+                })
+                .catch((err) => {
+                    console.log("selectAllFromChartInfoTable failed" + err);
+                })
+        }
+    }, [])
+
 
     {/* 1. Query 입력 & 제출 버튼 */}
     {/* 2. 결과 테이블 */}
@@ -24,7 +56,8 @@ const CustomSqlSearchPage = () => {
     
     // 제출 버튼 클릭 시, resultTableInfo에 정보 채우기
     const handleQueryButtonClick = () => {
-        showResultTableByCustomQuery(customQuery)
+        const userId = Number(sessionStorage.getItem('userTableId'));
+        showResultTableByCustomQuery(customQuery, userId)
         .then((list) => {
             setResultTableInfo(
                 list.map((item) => {
@@ -76,7 +109,8 @@ const CustomSqlSearchPage = () => {
                 "barX": barX ? barX : "",
                 "barY": barY ? barY : "",
                 "barColor": barColor ? barColor : ""
-            }
+            },
+            userId: Number(sessionStorage.getItem("userTableId"))
             }
             insertIntoChartInfo(chartInfoData)
                 .then((res) => {
@@ -98,7 +132,8 @@ const CustomSqlSearchPage = () => {
             "chartConfig": {
                 "lineX": lineX ? lineX : "",
                 "lineY": lineY ? lineY : ""
-            }
+            },
+            userId: Number(sessionStorage.getItem("userTableId"))
             }
             insertIntoChartInfo(chartInfoData)
                 .then((res) => {
@@ -120,7 +155,8 @@ const CustomSqlSearchPage = () => {
                 "scatterX": scatterX ? scatterX : "",
                 "scatterY": scatterY ? scatterY : "",
                 "scatterColor": scatterColor ? scatterColor : ""
-            }
+            },
+            userId: Number(sessionStorage.getItem("userTableId"))
             }
             insertIntoChartInfo(chartInfoData)
                 .then((res) => {

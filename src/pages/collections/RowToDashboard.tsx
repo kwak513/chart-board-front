@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { useLocation } from "react-router-dom";
@@ -10,6 +10,7 @@ import DrawScatterChartComponent from "../../components/customSqlSearch/DrawScat
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
+// 대시보드 조회 페이지인 CollectionDashboardListPage에서 대시보드명 클릭하면, 대시보드 보여주는 페이지
 const RowToDashboard = () => {
 
     // CollectionDashboardListPage에서 dashboard_info table의 id, dashboard_name 받기
@@ -105,14 +106,38 @@ const RowToDashboard = () => {
         alert("대시보드가 저장되었습니다.")
     }
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+        const showModal = () => {
+            setIsModalOpen(true);
+        };
+        const handleOk = () => {
+            setIsModalOpen(false);
+        };
+        const handleCancel = () => {
+            setIsModalOpen(false);
+        };
+    
+        const handleAddCharts = () => {
+        }
+
+
     
     return (
         <>
             <div>
                 <div className='flex justify-end gap-5'>
-                    <Button color="primary" variant="outlined">차트 추가</Button>
+                    <Button color="primary" variant="outlined" onClick={showModal}>차트 추가</Button>
                     <Button color="primary" variant="outlined" onClick={handleDashboardSaveClick}>저장</Button>
                 </div>
+
+                <Modal title="대시보드에 차트 추가" open={isModalOpen} 
+                    onOk={() => {
+                        handleAddCharts();
+                        handleOk();
+                    }} 
+                    onCancel={handleCancel}>
+                </Modal>
 
                 <ResponsiveGridLayout
                     className="layout"

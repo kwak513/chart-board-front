@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import { selectAllFromChartInfoTable } from "../../api/chartboardApi";
+import { selectAllFromChartInfoTable, selectFromChartInfoTableByUserId } from "../../api/chartboardApi";
 import { Descriptions, Table } from "antd";
 import Title from "antd/es/typography/Title";
 import { useNavigate } from "react-router-dom";
 
+// 저장된 차트 조회 페이지
 const CollectionChartListPage = () => {
 
     const [collectionChartList, setCollectionChartList] = useState<any[]>([]);
     const [collectionChartTableColumn, setCollectionChartTableColumn] = useState<{ title: string; dataIndex: string; width: string; }[]>([]);
     
     useEffect(() => {
-        selectAllFromChartInfoTable()
+        const userId = Number(sessionStorage.getItem('userTableId'));
+
+        selectFromChartInfoTableByUserId(userId)
             .then((list) => { // chartInfoList: [{...}, {...}]
                 setCollectionChartList(
                     list.map((item) => {
@@ -39,6 +42,8 @@ const CollectionChartListPage = () => {
     interface ChartRecord{
         chart_name: string;
         CHART_TYPE: string;
+        CHART_CONFIG: object;
+        RESULT_TABLE_INFO: any[];
         key: string; // 각 행의 고유 키
     }
 

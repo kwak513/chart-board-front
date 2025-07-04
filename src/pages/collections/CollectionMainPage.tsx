@@ -1,6 +1,7 @@
 import { Card } from "antd";
 import { useNavigate } from "react-router-dom";
 
+// 저장된 차트 조회, 대시보드 조회 분기 페이지
 const CollectionMainPage = () => {
     const navigate = useNavigate();
 

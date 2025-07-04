@@ -3,6 +3,7 @@ import DrawBarChartComponent from "../../components/customSqlSearch/DrawBarChart
 import DrawLineChartComponent from "../../components/customSqlSearch/DrawLineChartComponent";
 import DrawScatterChartComponent from "../../components/customSqlSearch/DrawScatterChartComponent";
 
+// 저장된 차트 조회 페이지인 CollectionChartListPage에서 차트명 클릭하면, 차트 보여주는 페이지
 const RowToChartPage = () => {
     const location = useLocation();
     const { chartData } = location.state || {};

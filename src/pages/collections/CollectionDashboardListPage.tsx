@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { insertIntoDashboardInfo, selectAllFromDashboardInfoTable } from "../../api/chartboardApi";
+import { insertIntoDashboardInfo, selectFromDashboardInfoTableByUserId } from "../../api/chartboardApi";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, Modal, Table } from "antd";
 import Title from "antd/es/typography/Title";
 
+// 대시보드 조회 페이지
 const CollectionDashboardListPage = () => {
     const [collectionDashboardList, setCollectionDashboardList] = useState<any[]>([]);
     const [collectionDashboardTableColumn, setCollectionDashboardTableColumn] = useState<{ title: string; dataIndex ?: string; width: string; render ?: () => string}[]>([]);
@@ -12,7 +13,9 @@ const CollectionDashboardListPage = () => {
     const [dashboardName, setDashboardName] = useState<string>(''); // 새로운 대시보드 이름
     
     useEffect(() => {
-        selectAllFromDashboardInfoTable()
+        const userId = Number(sessionStorage.getItem('userTableId'));
+
+        selectFromDashboardInfoTableByUserId(userId)
             .then((list) => { // dashboardList = [{"dashboard_name": , "id": }, {}, {} ...]
                 setCollectionDashboardList(
                     list.map((item) => {
@@ -26,7 +29,7 @@ const CollectionDashboardListPage = () => {
                 ]);
             })
             .catch((err) => {
-                console.log("selectAllFromDashboardInfoTable failed" + err);
+                console.log("selectFromDashboardInfoTableByUserId failed" + err);
                 alert("저장된 차트 정보를 불러오지 못했습니다.");
             })
     }, [])
@@ -58,13 +61,22 @@ const CollectionDashboardListPage = () => {
     };
 
     const handleAddNewDashboard = () => {
-console.log("dashboardName: ", dashboardName);        
-        insertIntoDashboardInfo(dashboardName)
+console.log("dashboardName: ", dashboardName); 
+
+        const dashboardDto = {
+            dashboardName: dashboardName,
+            userId: Number(sessionStorage.getItem('userTableId')),
+        }
+
+
+        insertIntoDashboardInfo(dashboardDto)
             .then((bool) => {
                 if(bool){
                     alert("대시보드를 추가했습니다.")
 
-                    selectAllFromDashboardInfoTable()
+                    const userId = Number(sessionStorage.getItem('userTableId'));
+
+                    selectFromDashboardInfoTableByUserId(userId)
                     .then((list) => { // dashboardList = [{"dashboard_name": , "id": }, {}, {} ...]
                         setCollectionDashboardList(
                             list.map((item) => {
@@ -78,7 +90,7 @@ console.log("dashboardName: ", dashboardName);
                         ]);
                     })
                     .catch((err) => {
-                        console.log("selectAllFromDashboardInfoTable failed" + err);
+                        console.log("selectFromDashboardInfoTableByUserId failed" + err);
                         alert("저장된 차트 정보를 불러오지 못했습니다.");
                     })
 

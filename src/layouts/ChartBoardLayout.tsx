@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Layout, Menu, theme } from 'antd';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -33,8 +33,7 @@ function getItem(
 const items: MenuItem[] = [
   getItem('홈', '/', <HomeOutlined />),
   getItem('컬렉션', 'sub1', <FolderOutlined />, [
-    getItem('컬렉션 1', '/collection1'),
-    getItem('컬렉션 2', '/collection2')
+    getItem('컬렉션 1', '/collection1')
   ]),
   getItem('데이터', 'sub2', <BarChartOutlined />, [
     getItem('데이터 탐색', '/dblist')
@@ -59,10 +58,24 @@ const ChartBoardLayout: React.FC = () => {
     }
   }
 
-  // '+ SQL 쿼리' 버튼 누르면 navigate
+  // '차트 추가' 버튼 누르면 navigate
   const handleNewSqlClick = () => {
     navigate("/customsql");
   }
+
+  // 로그인·회원가입 버튼 누르면 navigate
+  const handleLoginClick = () => {
+    navigate("/login");
+  }
+  // 로그아웃 버튼 누르면 navigate
+  const handleLogoutClick = () => {
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('userTableId');
+    alert("로그아웃 되었습니다.")
+    navigate('/');
+  }
+  
+  
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -71,8 +84,16 @@ const ChartBoardLayout: React.FC = () => {
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} onClick={handleMenuClick}/>
       </Sider>
       <Layout>
-        <Header style={{ padding:"0 16px", background: colorBgContainer, display: "flex", justifyContent: "flex-end", alignItems: "center"}}>
-          <Button type="primary" onClick={handleNewSqlClick}>+ SQL 쿼리</Button>
+        <Header style={{ padding:"0 16px", background: colorBgContainer, display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+          <Link to="/">
+            <img src='/ChartBoardLogoForNav.png' alt="로고" style={{ width: 150 }} />
+          </Link>
+          <div>
+            {!sessionStorage.getItem('isLoggedIn')?<Button onClick={handleLoginClick}>로그인·회원가입</Button>: <Button onClick={handleLogoutClick}>로그아웃</Button>}
+            
+            <Button type="primary" onClick={handleNewSqlClick} style={{ marginLeft: 10 }}>차트 추가</Button>
+          </div>
+          
         </Header>
         <Content style={{ margin: '16px' }}>
           {/* <Breadcrumb style={{ margin: '16px 0' }}>
