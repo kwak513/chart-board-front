@@ -1,8 +1,8 @@
-import { Button, Modal } from "antd";
+import { Button, Checkbox, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import { useLocation } from "react-router-dom";
-import { selectChartFromDashboard, updateChartDashboardConnect } from "../../api/chartboardApi";
+import { insertManyChartsIntoDashboard, selectChartFromDashboard, selectFromChartInfoTableByUserId, updateChartDashboardConnect } from "../../api/chartboardApi";
 import DrawBarChartComponent from "../../components/customSqlSearch/DrawBarChartComponent";
 import DrawLineChartComponent from "../../components/customSqlSearch/DrawLineChartComponent";
 import DrawScatterChartComponent from "../../components/customSqlSearch/DrawScatterChartComponent";
@@ -12,6 +12,21 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 // 대시보드 조회 페이지인 CollectionDashboardListPage에서 대시보드명 클릭하면, 대시보드 보여주는 페이지
 const RowToDashboard = () => {
+
+    // 대시보드에 차트 추가하기 위한 코드
+    interface UserChart {
+        id: number;
+        chart_name: string;
+        CHART_TYPE: string;
+    }
+
+    // 1. 사용자의 차트 정보 저장
+    const [userCharts, setUserCharts] = useState<UserChart[]>([]);
+
+    // 2. 사용자가 선택한 차트 배열
+    const [selectedChartIds, setSelectedChartIds] = useState<number[]>([]);    
+
+
 
     // CollectionDashboardListPage에서 dashboard_info table의 id, dashboard_name 받기
     const location = useLocation();
@@ -108,27 +123,96 @@ const RowToDashboard = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     
-        const showModal = () => {
-            setIsModalOpen(true);
-        };
-        const handleOk = () => {
-            setIsModalOpen(false);
-        };
-        const handleCancel = () => {
-            setIsModalOpen(false);
-        };
+    const showModal = () => {
+        setIsModalOpen(true);
+
+        // 모달이 열리면, 사용자의 차트 목록 불러오기
+        const userId = Number(sessionStorage.getItem('userTableId'));
+
+        selectFromChartInfoTableByUserId(userId)
+            .then((res) => {
+                // selectFromChartInfoTableByUserId의 결과 중 필요한 부분(id, 차트 이름, 차트 종류만 저장함.)
+                const data = res.map((item) => ({
+                    id: item.id,
+                    chart_name: item.chart_name,
+                    CHART_TYPE: item.CHART_TYPE
+                }))
+                setUserCharts(data);
+            })
+            .catch((err) => {
+                console.log("selectFromChartInfoTableByUserId failed" + err);
+                alert("저장된 차트 정보를 불러오지 못했습니다.");
+            })
+    };
+    const handleOk = () => {
+        setIsModalOpen(false);
+    };
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
     
-        const handleAddCharts = () => {
+    // 모달에서 OK 누르면, 
+    const handleAddCharts = () => {
+        if(selectedChartIds.length === 0){
+            alert("추가된 차트가 없습니다.")
+            return;
         }
 
+        const insertChartsIntoDashboardDto = {
+            dashboardInfoId: id,
+            chartInfoIds: selectedChartIds
+        }
+        // 대시보드에 차트 추가하는 로직 호출
+        insertManyChartsIntoDashboard(insertChartsIntoDashboardDto)
+            .then((bool) => {
+                if(bool){
+                    alert("대시보드에 차트가 추가되었습니다.");
 
-    
+                    setSelectedChartIds([]);    // 선택된 차트 초기화
+                    // 대시보드의 차트 정보 다시 불러오기
+                    selectChartFromDashboard(id)
+                    .then((list) => {
+                        setChartInfo(list);
+                        console.log("selectChartFromDashboard 결과: " + JSON.stringify(list));
+                    })
+                    .catch((err) => {
+                        console.log("selectChartFromDashboard failed" + err);
+                        alert("대시보드의 차트 정보를 불러오지 못했습니다.")
+                    })
+                }
+                else{
+                    alert("대시보드에 차트가 추가되지 않았습니다.");
+                    return;
+                }
+                
+            })
+            .catch((err) => {
+                console.log("insertManyChartsIntoDashboard failed" + err);
+                alert("서버 오류로 차트를 저장하지 못했습니다.");
+            })
+
+    }
+
+    // 차트의 id와 체크박스 체크 유무를 매개변수로 받고, selectedChartIds 배열을 변경하는 함수
+    const onCheck = (id: number, checked: boolean) => {
+        // 체크되어있으면 selectedChartIds 배열에 id 추가
+        if(checked){
+            setSelectedChartIds(prev => [...prev, id]);
+        }
+        // 체크 안되어있으면 selectedChartIds 배열에서 id 삭제
+        else{
+            setSelectedChartIds(prev => prev.filter(item => item !== id))
+        }
+    }
+
+
+
     return (
         <>
             <div>
                 <div className='flex justify-end gap-5'>
                     <Button color="primary" variant="outlined" onClick={showModal}>차트 추가</Button>
-                    <Button color="primary" variant="outlined" onClick={handleDashboardSaveClick}>저장</Button>
+                    <Button color="primary" variant="outlined" onClick={handleDashboardSaveClick}>위치·크기 저장</Button>
                 </div>
 
                 <Modal title="대시보드에 차트 추가" open={isModalOpen} 
@@ -137,6 +221,24 @@ const RowToDashboard = () => {
                         handleOk();
                     }} 
                     onCancel={handleCancel}>
+                        {/* 사용자의 차트 정보를 각각 checkbox로 표시함 */}
+                        {userCharts.map((chart) => (
+                            <div key={chart.id}>
+                                <Checkbox
+                                    value={chart.id}
+                                    // selectedChartIds에 포함되어있으면 체크, 아니면 체크 X
+                                    checked={selectedChartIds.includes(chart.id)}
+                                    onChange={(e) => onCheck(chart.id, e.target.checked)}
+                                >
+                                    {`[${chart.CHART_TYPE}]`} {chart.chart_name} 
+                                </Checkbox>
+                            </div>
+                        ))}
+
+
+
+
+
                 </Modal>
 
                 <ResponsiveGridLayout

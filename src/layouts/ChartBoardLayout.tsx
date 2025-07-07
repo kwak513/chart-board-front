@@ -58,7 +58,7 @@ const ChartBoardLayout: React.FC = () => {
     }
   }
 
-  // '차트 추가' 버튼 누르면 navigate
+  // '+SQL 쿼리' 버튼 누르면 navigate
   const handleNewSqlClick = () => {
     navigate("/customsql");
   }
@@ -91,7 +91,7 @@ const ChartBoardLayout: React.FC = () => {
           <div>
             {!sessionStorage.getItem('isLoggedIn')?<Button onClick={handleLoginClick}>로그인·회원가입</Button>: <Button onClick={handleLogoutClick}>로그아웃</Button>}
             
-            <Button type="primary" onClick={handleNewSqlClick} style={{ marginLeft: 10 }}>차트 추가</Button>
+            <Button type="primary" onClick={handleNewSqlClick} style={{ marginLeft: 10 }}>+ SQL 쿼리</Button>
           </div>
           
         </Header>

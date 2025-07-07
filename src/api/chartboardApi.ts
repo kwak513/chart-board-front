@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_SERVER_URL = "http://localhost:8080";
 
+// -------------------------- 차트 관련 --------------------------
 //	customQuery의 결과 데이터 반환
 export const showResultTableByCustomQuery = async(customQuery:string, userId: number) => {
     const res = await axios.get(`${API_SERVER_URL}/showResultTableByCustomQuery`, {params: {customQuery, userId}});
@@ -28,6 +29,13 @@ export const selectFromChartInfoTableByUserId = async(userId: number) => {
     return res.data;
 }
 
+// 차트 삭제 (user_chart_connect 연결 테이블, chart_info 테이블, chart_dashboard_connect 연결 테이블 에서 삭제)
+export const deleteChart = async(userId: number, chartId: number) => {
+    const res = await axios.delete(`${API_SERVER_URL}/deleteChart`, {params: {userId, chartId}});
+    return res.data;
+}
+
+// -------------------------- 대시보드 관련 --------------------------
 interface AddDashboardDto{
     dashboardName: string;
 
@@ -45,15 +53,6 @@ export const selectFromDashboardInfoTableByUserId = async(userId: number) => {
     return res.data;
 }
 // ---------------------
-interface ChartIntoDashboardDto{
-    dashboardId: number;
-    chartInfoIds: number[];
-}
-//	만들어진 대시보드에 차트들을 추가
-export const insertChartIntoDashboard = async(chartIntoDashboardDto: ChartIntoDashboardDto) => {
-    const res = await axios.post(`${API_SERVER_URL}/insertChartIntoDashboard`,chartIntoDashboardDto)
-    return res.data;
-}
 
 //	선택된 대시보드의 차트 정보 가져오기(dashboard_x, dashboard_y, dashboard_w, dashboard_h, CHART_TYPE, RESULT_TABLE_INFO, CHART_CONFIG, chart_name)
 export const selectChartFromDashboard = async(dashboardInfoId:number) => {
@@ -73,6 +72,23 @@ interface ChartDashboardConnectDto{
 //	대시보드에서 차트의 x, ,y, w, h 수정
 export const updateChartDashboardConnect = async(chartDashboardConnectDto: ChartDashboardConnectDto) => {
     const res = await axios.put(`${API_SERVER_URL}/updateChartDashboardConnect`,chartDashboardConnectDto)
+    return res.data;
+}
+
+interface ChartsIntoDashboardDto{
+    dashboardInfoId: number;
+    chartInfoIds: number[];
+}
+
+// 프론트에서 직접 호출 O - 대시보드에 차트 1개 이상 추가(차트의 id를 순회하며, insertChartIntoDashboard 호출)
+export const insertManyChartsIntoDashboard = async(chartsIntoDashboardDto: ChartsIntoDashboardDto) => {
+    const res = await axios.post(`${API_SERVER_URL}/insertManyChartsIntoDashboard`, chartsIntoDashboardDto)
+    return res.data;
+}
+
+// 대시보드 삭제 (user_dashboard_connect 연결 테이블, dashboard_info 테이블, chart_dashboard_connect 연결 테이블에서 삭제)
+export const deleteDashboard = async(userId: number, dashboardId: number) => {
+    const res = await axios.delete(`${API_SERVER_URL}/deleteDashboard`, {params: {userId, dashboardId}});
     return res.data;
 }
 
