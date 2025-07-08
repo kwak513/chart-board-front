@@ -18,6 +18,7 @@ const CustomSqlSearch = lazy(() => import("../pages/customSqlSearch/CustomSqlSea
 const Login = lazy(() => import("../pages/user/LoginPage"));
 const Signup = lazy(() => import("../pages/user/SignupPage"));
 const ConnectDb = lazy(() => import("../pages/user/ConnectDbPage"));
+const MyPage = lazy(() => import("../pages/user/MyPage"));
 
 const LoadingScreen = () => (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
             {path: "login", element: <Suspense fallback={<LoadingScreen />}><Login /></Suspense>},
             {path: "signup", element: <Suspense fallback={<LoadingScreen />}><Signup /></Suspense>},
             {path: "dbconnect", element: <Suspense fallback={<LoadingScreen />}><ConnectDb /></Suspense>},
+            {path: "mypage", element: <Suspense fallback={<LoadingScreen />}><MyPage /></Suspense>},
             
         ]
 

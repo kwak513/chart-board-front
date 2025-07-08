@@ -3,17 +3,42 @@ import { Button, Input } from 'antd'
 import Title from 'antd/es/typography/Title'
 import React, { useEffect, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { insertIntoDbConnection } from '../../api/chartboardApi';
+import { insertIntoDbConnection, selectCountFromDbConnection } from '../../api/chartboardApi';
 
 export default function ConnectDbPage() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-      //  로그인 되어 있으면 접근 X
-      if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-          alert("로그인이 필요합니다.");
-          navigate('/login'); 
-      }
+    useEffect(() => {
+    
+
+
+    //  로그인 안되어있으면 접근 X
+    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+        alert("로그인이 필요합니다.");
+        navigate('/login'); 
+    }
+
+    else{
+    
+        const userTableId = Number(sessionStorage.getItem("userTableId"));
+
+        console.log("userTableId", userTableId);
+
+        // 데이터베이스를 이미 등록한 사용자라면 접근 X
+        selectCountFromDbConnection(userTableId)
+            .then((res) => {
+                if(res){
+                    alert("데이터베이스 정보가 이미 등록되어있습니다.");
+                    navigate('/mypage');
+                }
+
+            })
+            .catch((err) => {
+                console.log("selectAllFromChartInfoTable failed" + err);
+            })
+    }
+    
+
   }, [])
 
 
@@ -78,7 +103,7 @@ export default function ConnectDbPage() {
             display: 'flex',
             flexDirection: 'column',
             margin: '0 auto 40px auto', 
-            maxWidth: '400px', 
+            maxWidth: '500px', 
             padding: '24px 32px', 
             border: '1px solid #d9d9d9', 
             borderRadius: '8px', 

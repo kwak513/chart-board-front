@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import {
   BarChartOutlined,
+  DashboardOutlined,
+  DatabaseOutlined,
   FolderOutlined,
   HomeOutlined,
+  IdcardOutlined,
+  LayoutOutlined,
+  LineChartOutlined,
+  PieChartOutlined,
+  UserOutlined,
 
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Button, Layout, Menu, theme } from 'antd';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -31,12 +38,16 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('홈', '/', <HomeOutlined />),
-  getItem('컬렉션', 'sub1', <FolderOutlined />, [
-    getItem('컬렉션 1', '/collection1')
-  ]),
-  getItem('데이터', 'sub2', <BarChartOutlined />, [
-    getItem('데이터 탐색', '/dblist')
+  getItem('차트·대시보드', '/collection1', <BarChartOutlined />,
+    [
+      getItem('차트 조회', '/chartlist', <LineChartOutlined />),
+      getItem('대시보드 조회', '/dashboardlist', <LayoutOutlined />),
+    ]
+
+  ),
+  getItem('회원', 'sub2', <UserOutlined />, [
+    getItem('DB 연결', '/dbconnect', <DatabaseOutlined />),
+    getItem('마이페이지', '/mypage', <IdcardOutlined />)
   ]),
 ];
 
@@ -44,6 +55,8 @@ const items: MenuItem[] = [
 
 
 const ChartBoardLayout: React.FC = () => {
+  const location = useLocation();
+
   const [collapsed, setCollapsed] = useState(false);
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -81,11 +94,12 @@ const ChartBoardLayout: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} onClick={handleMenuClick}/>
+        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} onClick={handleMenuClick} selectedKeys={[location.pathname]}/> 
+        {/* url 변화에 따라 사이드바 메뉴 선택이 자동으로 되도록, selectedKeys 사용 */}
       </Sider>
       <Layout>
         <Header style={{ padding:"0 16px", background: colorBgContainer, display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-          <Link to="/">
+          <Link to="/customsql">
             <img src='/ChartBoardLogoForNav.png' alt="로고" style={{ width: 150 }} />
           </Link>
           <div>

@@ -6,6 +6,7 @@ import { insertManyChartsIntoDashboard, selectChartFromDashboard, selectFromChar
 import DrawBarChartComponent from "../../components/customSqlSearch/DrawBarChartComponent";
 import DrawLineChartComponent from "../../components/customSqlSearch/DrawLineChartComponent";
 import DrawScatterChartComponent from "../../components/customSqlSearch/DrawScatterChartComponent";
+import { DeleteOutlined } from "@ant-design/icons";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -262,13 +263,15 @@ const RowToDashboard = () => {
                                 maxH: 3
                             }}
                         >
-                            <div style={{ width: "100%", height: "100%", maxWidth: '100%',maxHeight: '100%' }}
+                            <div style={{ width: "100%", height: "100%", maxWidth: '100%',maxHeight: '100%'}}
                                 onMouseDown={(e) => {
                                     // 클릭 이벤트가 드래그로 전파되지 않게 막기
                                     // e.stopPropagation();
                                 }}
                             >
                                 {renderCharts(info)}
+
+                            
                             </div>
 
                     </div>

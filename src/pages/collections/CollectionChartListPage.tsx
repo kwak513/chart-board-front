@@ -5,7 +5,7 @@ import Title from "antd/es/typography/Title";
 import { useNavigate } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
 
-// 저장된 차트 조회 페이지
+// 저장된 차트 조회 페이지 (Table 형식)
 const CollectionChartListPage = () => {
 
     const [collectionChartList, setCollectionChartList] = useState<any[]>([]);
@@ -147,7 +147,7 @@ const CollectionChartListPage = () => {
                 }
             })
             .catch((err) => {
-                console.error("insertIntoDbConnection 실패: ", err);
+                console.error("deleteChart 실패: ", err);
                 alert("서버 오류로 차트 삭제 실패했습니다.");
             });
     }
