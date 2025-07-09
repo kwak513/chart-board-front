@@ -100,8 +100,10 @@ npm install
 # 개발 서버 실행
 npm run dev
 ```
----
 ## 🧩 관련 레포지토리
 **Backend**: [Link to Backend Repo](https://github.com/kwak513/chart-board-back)
+
+
+---
 ---
 
